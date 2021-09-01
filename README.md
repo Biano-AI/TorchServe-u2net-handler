@@ -2,7 +2,7 @@
 
 Download pretrained model [U^2-net](https://drive.google.com/file/d/1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ/view?usp=sharing) or [U^2-netp](https://drive.google.com/file/d/1rbSTGKAE-MTxBYHd-51l2hMOQPT_7EPy/view?usp=sharing).
 
-### 1. create mar file
+### 1. Pack model tp .mar file
 ```bash
 docker run --rm -it --name mar -v $(pwd)/output:/output -v \
 $(pwd)/model:/model -v $(pwd)/src/:/src pytorch/torchserve:latest \
@@ -11,6 +11,18 @@ torch-model-archiver --model-name u2net --version ${MODEL_VERSION:-'1.0'} \
 --serialized-file /model/u2net.pth --export-path /output \
 --extra-files /src/unet_classes.py --handler /src/custom_handler.py
 ```
+
+or 
+
+```bash
+docker run --rm -it --name mar -v $(pwd)/output:/output -v \
+$(pwd)/model:/model -v $(pwd)/src/:/src pytorch/torchserve:latest \
+torch-model-archiver --model-name u2netp --version ${MODEL_VERSION:-'1.0'} \
+--model-file /src/u2netp.py \
+--serialized-file /model/u2netp.pth --export-path /output \
+--extra-files /src/unet_classes.py --handler /src/custom_handler.py
+```
+
 
 ### 2. Run TorchServe 
 ```bash
