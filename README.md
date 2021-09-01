@@ -2,7 +2,7 @@
 
 Download pretrained model [U^2-net](https://drive.google.com/file/d/1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ/view?usp=sharing) or [U^2-netp](https://drive.google.com/file/d/1rbSTGKAE-MTxBYHd-51l2hMOQPT_7EPy/view?usp=sharing).
 
-### 1. Pack model tp .mar file
+### 1. Pack model to .mar file
 ```bash
 docker run --rm -it --name mar -v $(pwd)/output:/output -v \
 $(pwd)/model:/model -v $(pwd)/src/:/src pytorch/torchserve:latest \
