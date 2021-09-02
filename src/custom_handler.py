@@ -77,16 +77,11 @@ class U2NetHandler(BaseHandler):
         ])
         return torch.stack([normalize(im) for im in data])
 
-    def basic_cutout(self, img, mask):
+    def _get_mask_bytes(self, img, mask):
         logger.info(img.size)
-        u2net_mask = Image.fromarray(mask).resize(img.size, Image.LANCZOS)
-        # return masked image
-        # mask = np.array(u2net_mask.convert("L")) / 255.0
-        # return img.copy().convert("RGBA").tobytes()
-        return u2net_mask.tobytes()
+        return Image.fromarray(mask).resize(img.size, Image.LANCZOS).tobytes()
 
     def postprocess(self, images, output):
-        # Convert 2D image to 1D vector
         pred = output[0][:, 0, :, :]
         predict = self._normPRED(pred)
         predict_np = predict.cpu().detach().numpy()
@@ -96,10 +91,11 @@ class U2NetHandler(BaseHandler):
         for im in images:
             logger.info(f'postprocessing image {i}')
             mask = (predict_np[i] * 255).astype(np.uint8)
-            res.append(self.basic_cutout(im, mask))
+            res.append(self._get_mask_bytes(im, mask))
         return res
 
     # normalize the predicted SOD probability map
+    # from oficial U^2-Net repo
     def _normPRED(self, d):
         ma = torch.max(d)
         mi = torch.min(d)
@@ -108,19 +104,12 @@ class U2NetHandler(BaseHandler):
 
     def load_images(self, data):
         images = []
-
         for row in data:
-            # Compat layer: normally the envelope should just return the data
-            # directly, but older versions of Torchserve didn't have envelope.
             image = row.get("data") or row.get("body")
             if isinstance(image, str):
-                # if the image is a string of bytesarray.
                 image = base64.b64decode(image)
-
-            # the image is sent as bytesarray
             image = Image.open(io.BytesIO(image))
             images.append(image)
-
         return images
 
     def handle(self, data, context):
