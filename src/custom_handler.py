@@ -79,7 +79,7 @@ class U2NetHandler(BaseHandler):
 
     def _get_mask_bytes(self, img, mask):
         logger.info(img.size)
-        return Image.fromarray(mask).resize(img.size, Image.LANCZOS).tobytes()
+        return Image.fromarray(mask).resize(img.size, Image.BILINEAR).tobytes()
 
     def postprocess(self, images, output):
         pred = output[0][:, 0, :, :]
